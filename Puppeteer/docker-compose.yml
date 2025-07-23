@@ -1,0 +1,9 @@
+services:
+  puppeteer-service:
+    build: .
+    ports:
+      - "8765:8765"
+    volumes:
+      - .:/app
+    environment:
+      - NODE_ENV=development
