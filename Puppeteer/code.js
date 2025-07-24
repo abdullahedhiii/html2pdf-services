@@ -16,7 +16,7 @@ app.post('/export', async (req, res) => {
   let browser;
   try {
     browser = await puppeteer.launch({
-      executablePath: '/usr/bin/chromium',
+      // executablePath: '/usr/bin/chromium',
       ignoreHTTPSErrors: true,
       args: [
         '--no-sandbox',
@@ -27,7 +27,7 @@ app.post('/export', async (req, res) => {
     });
 
     const page = await browser.newPage();
-    await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
 
     if(type == 'pdf'){
         const pdfBuffer = await page.pdf({ format: 'A4' });  

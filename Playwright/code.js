@@ -1,47 +1,67 @@
 import express from 'express';
-import { chromium } from 'playwright'; 
+import { chromium } from 'playwright';
 
 const app = express();
 const PORT = 8765;
 
 app.use(express.json());
 
-app.post('/export', async (req, res) => {
-  const {url,type} = req.body
-  let browser;
+let browser;
+
+(async () => {
   try {
-     browser = await chromium.launch({
-      args: ['--no-sandbox'],
-      headless: true
+    browser = await chromium.launch({
+      // executablePath: '/usr/bin/chromium',
+      headless: true,
+      args: ['--no-sandbox']
     });
 
-    const page = await browser.newPage();
-    await page.goto(url, { waitUntil: 'load',timeout : 60000 });
+    app.post('/export', async (req, res) => {
+      const { url, type } = req.body;
 
-    if(type == 'pdf'){
-        const pdfBuffer = await page.pdf({ format: 'A4' }); 
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'attachment; filename="output.pdf"');
-        res.send(pdfBuffer);     
-    }
-    else{
-      res.status(200).json({ message: 'Not yet implemented.' });
-    }
+      if (!url || !type) {
+        return res.status(400).json({ error: 'Missing url or type in request body' });
+      }
+
+      const context = await browser.newContext(); 
+      const page = await context.newPage();
+
+      try {
+        await page.goto(url, {
+          waitUntil: 'domcontentloaded',
+          timeout: 60000
+        });
+
+        if (type === 'pdf') {
+          const pdfBuffer = await page.pdf({ format: 'A4' });
+          res.setHeader('Content-Type', 'application/pdf');
+          res.setHeader('Content-Disposition', 'attachment; filename="output.pdf"');
+          res.send(pdfBuffer);
+        } else {
+          res.status(400).json({ error: 'Unsupported export type' });
+        }
+      } catch (err) {
+        console.error('Error rendering page:', err);
+        res.status(500).json({ error: 'Failed to render page', details: err.message });
+      } finally {
+        await context.close(); 
+      }
+    });
+
+    app.listen(PORT, () => {
+      console.log(`Playwright PDF service running at http://localhost:${PORT}`);
+    });
+
+    process.on('SIGINT', async () => {
+      console.log('Shutting down...');
+      await browser?.close();
+      process.exit();
+    });
+
   } catch (err) {
-    console.error('Error rendering page:', err);
-    res.status(500).json({ error: 'Failed to render page', details: err.message });
-  } finally {
-    if (browser) await browser.close();
+    console.error('Failed to launch browser:', err);
+    process.exit(1);
   }
-});
-
-try{
-  app.listen(PORT, () => {
-  console.log(`Playwright PDF service running at http://localhost:${PORT}`);
-});
-}
-catch(err){
-    console.error('Error starting server:', err);
-}
+})();
 
 export default app;

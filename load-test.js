@@ -2,8 +2,8 @@ export const options = {
   scenarios: {
     my_test: {
       executor: 'shared-iterations',
-      vus: 200,            
-      iterations: 200,    
+      vus: 400,            
+      iterations: 400,    
       maxDuration: '30s', 
     },
   },
@@ -18,8 +18,8 @@ export default function () {
       'Content-Type': 'application/json'
     },
     payload: JSON.stringify({
-      url: 'http://example.com',
-      type: 'pdf'
+      url: __ENV.URL,
+      type: __ENV.TYPE
     })
   });
   console.log(`Response time: ${res.timings.duration} ms`);
