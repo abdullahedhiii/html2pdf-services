@@ -1,0 +1,20 @@
+{
+  "name": "puppeteer-cluster",
+  "version": "1.0.0",
+  "main": "code.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon code.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^5.1.0",
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7",
+    "puppeteer-cluster": "^0.24.0",
+    "url": "^0.11.4"
+  }
+}

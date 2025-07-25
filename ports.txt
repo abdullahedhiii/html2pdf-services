@@ -1,0 +1,15 @@
+puppeteer=9900
+playwright=8765 
+gotenberg=3000
+
+
+vus=10
+puppeteer 6.11s
+playwright 3.54s
+gotenberg 6.25s
+
+
+vus=30
+puppeteer 18.36s
+playwright 10.72s
+gotenberg 12.83s
